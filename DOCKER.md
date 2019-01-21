@@ -35,6 +35,13 @@ docker run alpine cat /etc/alpine-release
 3.8.0
 ```
 
+Attach to a running container in interactive mode:
+```
+# docker exec -it a5d95c2cc9a2 sh
+
+sh-4.2#
+```
+
 Bypass `CMD` or `ENTRYPOINT` (see below how to get them):
 ```
 # docker run -it nginx bash
@@ -47,7 +54,7 @@ root@9c36f4645b92:/#
 ```
 
 
-## Output formatting
+## Inspection and output formatting
 
 Docker commandline supports Go template formatting, the placeholder for each subcommand can be found on its documentation page.
 
