@@ -7,7 +7,7 @@
 
 
 
-## Multiple composer files - single network
+## Multiple compose files on a single network
 
 Example: 
  * A running Zabbix monitoring stack with an existing compose file
