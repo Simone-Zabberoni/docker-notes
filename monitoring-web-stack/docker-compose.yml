@@ -1,0 +1,61 @@
+version: '2'
+
+services:
+  nginx-proxy:
+    # https://github.com/jwilder/nginx-proxy
+    restart: always
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - DEFAULT_HOST=something.monitor.here
+
+  grafana:
+    # http://docs.grafana.org/installation/docker/
+    restart: always
+    image: grafana/grafana
+    volumes:
+     - grafana-storage:/var/lib/grafana
+    environment:
+     - VIRTUAL_HOST=grafana.monitor.here
+     - GF_SERVER_ROOT_URL=http://grafana.monitor.here
+     - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource,alexanderzobnin-zabbix-app
+
+  zabbix-frontend:
+    # https://github.com/zabbix/zabbix-docker/tree/4.0/web-nginx-mysql/centos
+    restart: always
+    image: zabbix/zabbix-web-nginx-mysql
+    environment:
+     - VIRTUAL_HOST=zabbixFE.monitor.here
+     - DB_SERVER_HOST=databaseServer
+     - MYSQL_USER=zabbix
+     - ZBX_SERVER_HOST=zabbixServer
+     - PHP_TZ=Europe/Rome
+    # Env store for passwords
+    env_file: .env
+
+  phpmyadmin:
+    # https://hub.docker.com/r/phpmyadmin/phpmyadmin/
+    restart: always
+    image: phpmyadmin/phpmyadmin
+    environment:
+     - VIRTUAL_HOST=phpmyadmin.monitor.here
+     - PMA_HOST=databaseServer
+
+  monitoring-base:
+    # https://hub.docker.com/_/httpd/
+    restart: always
+    image: httpd:2.4
+    volumes:
+     - monitoring-base-storage:/usr/local/apache2/htdocs
+    environment:
+     - VIRTUAL_HOST=www.monitor.here
+
+volumes:
+  # Persistent local volume for grafana
+  grafana-storage:
+
+  # Persistent local volume static index page
+  monitoring-base-storage:
