@@ -1,25 +1,27 @@
 # Docker sample uses
 
-
-## Basic stuff 
-
+## Basic stuff
 
 Build image from Dockerfile in current directory, tag it with a specific name and label:
+
 ```
 docker build . -t my-image:v2
 ```
 
 Run nginx container with port mapping (host:container):
+
 ```
 docker run -p 8091:80  nginx
 ```
 
 Run nginx container with volume mapping (hostdir/containterdir):
+
 ```
 docker run -v /some/local/dir/:/usr/share/nginx/html:ro nginx
 ```
 
 Run container interactively:
+
 ```
 # hostname
 my_docker_host
@@ -30,12 +32,14 @@ f1de6589e1ad
 ```
 
 Run a command on the container, then exit:
+
 ```
 docker run alpine cat /etc/alpine-release
 3.8.0
 ```
 
 Attach to a running container in interactive mode:
+
 ```
 # docker exec -it a5d95c2cc9a2 sh
 
@@ -43,29 +47,32 @@ sh-4.2#
 ```
 
 Bypass `CMD` or `ENTRYPOINT` (see below how to get them):
+
 ```
 # docker run -it nginx bash
 root@0aa132d3241b:/#
 ```
+
 or
+
 ```
 docker run -it --entrypoint bash nginx
 root@9c36f4645b92:/#
 ```
-
 
 ## Inspection and output formatting
 
 Docker commandline supports Go template formatting, the placeholder for each subcommand can be found on its documentation page.
 
 For example:
+
 - https://docs.docker.com/engine/reference/commandline/images/#formatting
 - https://docs.docker.com/engine/reference/commandline/ps/#formatting
-etc.
+  etc.
 
 Generic formatting guide:
-- https://docs.docker.com/config/formatting/
 
+- https://docs.docker.com/config/formatting/
 
 Examples:
 
@@ -92,12 +99,26 @@ running
 2018-08-22T10:48:17.343581763Z
 ```
 
-Get  `CMD` and `ENTRYPOINT` for a specific image:
+Get `CMD` and `ENTRYPOINT` for a specific image:
+
 ```
 # docker image inspect --format='CMD={{.Config.Cmd}}{{println}}ENTRYPOINT={{.Config.Entrypoint}}' nginx
 CMD=[nginx -g daemon off;]
 ENTRYPOINT=[]
 ```
 
+Associate running container to its compose project:
 
+```
+# docker inspect  --format='{{.Name}}  {{index .Config.Labels "com.docker.compose.project"}}' a044556677a0
+/traefik  reverseproxy
+```
 
+For all running containers:
+
+```
+docker ps   --format='{{.ID}}' | xargs docker inspect  --format='{{.Name}}  {{index .Config.Labels "com.docker.compose.project"}}'
+/traefik  reverseproxy
+/utility_watchtower  utility
+/somethine  another_compose
+```
